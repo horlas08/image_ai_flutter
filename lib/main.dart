@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_ai/routes/get_pages.dart';
 import 'package:image_ai/controllers/Auth/auth_controller.dart';
 import 'package:image_ai/localization/app_translations.dart';
+import 'package:image_ai/controllers/billing_controller.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
@@ -37,6 +38,11 @@ class MyApp extends StatelessWidget {
 
       theme: ThemeData(
         primaryColor: Colors.deepPurple,
+        snackBarTheme:  SnackBarThemeData(
+          showCloseIcon: true,
+          behavior: SnackBarBehavior.floating,
+
+        ),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         inputDecorationTheme: const InputDecorationTheme(
           border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -52,6 +58,7 @@ class MyApp extends StatelessWidget {
       getPages: GetPages.getPage,
       initialBinding: BindingsBuilder(() {
         Get.put(AuthController(), permanent: true);
+        Get.put(BillingController(), permanent: true);
       }),
     );
   }

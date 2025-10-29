@@ -25,6 +25,12 @@ class AppTranslations extends Translations {
           'tap_to_select_room_image': 'Tap to select room image',
           'style_choice': 'Style Choice',
           'redesign': 'Redesign',
+          'remove_ads': 'Remove Ads (Pro)',
+          'go_pro': 'Go Pro',
+          'yearly_plan': 'Yearly Plan',
+          'weekly_plan': 'Weekly Plan',
+          'subscribe': 'Subscribe',
+          'restore_purchases': 'Restore Purchases',
           'redesign_requested': 'Room redesign requested',
           // Styles
           'modern': 'Modern',
@@ -69,6 +75,13 @@ class AppTranslations extends Translations {
           'account_created_please_login': 'Account created. Please login.',
           'password_reset_success': 'Password reset successful. Please login.',
           'session_expired': 'Your session has expired. Please login again.',
+          'choose_image_source': 'Choose image source',
+          'camera': 'Camera',
+          'gallery': 'Gallery',
+          'room_redesign': 'Room Redesign',
+          'tap_to_select_room_image': 'Tap to select room image',
+          'style_choice': 'Style Choice',
+          'redesign': 'Redesign',
 
           // Auth screens
           'login': 'Login',
@@ -111,6 +124,12 @@ class AppTranslations extends Translations {
           'tap_to_select_room_image': 'اضغط لاختيار صورة الغرفة',
           'style_choice': 'اختيار النمط',
           'redesign': 'إعادة التصميم',
+          'remove_ads': 'إزالة الإعلانات (برو)',
+          'go_pro': 'الترقية إلى برو',
+          'yearly_plan': 'الخطة السنوية',
+          'weekly_plan': 'الخطة الأسبوعية',
+          'subscribe': 'اشترك',
+          'restore_purchases': 'استعادة المشتريات',
           'redesign_requested': 'تم إرسال طلب إعادة التصميم',
           // Styles
           'modern': 'حديث',
@@ -155,6 +174,13 @@ class AppTranslations extends Translations {
           'account_created_please_login': 'تم إنشاء الحساب. يرجى تسجيل الدخول.',
           'password_reset_success': 'تمت إعادة تعيين كلمة المرور. يرجى تسجيل الدخول.',
           'session_expired': 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.',
+          'choose_image_source': 'اختر مصدر الصورة',
+          'camera': 'الكاميرا',
+          'gallery': 'المعرض',
+          'room_redesign': 'إعادة تصميم الغرفة',
+          'tap_to_select_room_image': 'اضغط لاختيار صورة الغرفة',
+          'style_choice': 'اختيار النمط',
+          'redesign': 'إعادة التصميم',
 
           // Auth screens
           'login': 'تسجيل الدخول',
@@ -184,5 +210,5 @@ Locale getInitialLocale() {
   // if (device != null && (device.languageCode == 'ar' || device.languageCode == 'en')) {
   //   return device;
   // }
-  return const Locale('ar');
+  return const Locale('en');
 }

@@ -7,6 +7,7 @@ import 'package:image_ai/view/style/app_text.dart';
 import 'package:image_ai/view/style/app_color.dart';
 import 'package:image_ai/view/widget/common/custom_input.dart';
 import 'package:image_ai/view/widget/common/custom_button.dart';
+import 'package:image_ai/controllers/billing_controller.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -55,12 +56,44 @@ class _ProfileState extends State<Profile> {
     super.dispose();
   }
 
-  Future<void> _pickAndUploadImage() async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 85,
+  Future<ImageSource?> _showImageSourceSheet() async {
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('choose_image_source'.tr, style: AppText.bold24.copyWith(fontSize: 18)),
+                const SizedBox(height: 12),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: Text('camera'.tr),
+                  onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: Text('gallery'.tr),
+                  onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
+                ),
+                const SizedBox(height: 4),
+              ],
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final source = await _showImageSourceSheet();
+    if (source == null) return;
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: source, imageQuality: 85);
     if (image == null) return;
     final auth = Get.find<AuthController>();
     try {
@@ -112,6 +145,14 @@ class _ProfileState extends State<Profile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => Get.find<BillingController>().showPaywall(),
+                icon: const Icon(Icons.workspace_premium_outlined),
+                label: Text('remove_ads'.tr),
+              ),
+            ),
             Center(
               child: Stack(
                 clipBehavior: Clip.none,

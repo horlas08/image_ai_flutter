@@ -11,6 +11,7 @@ import '../style/app_color.dart';
 import '../widget/common/custom_button.dart';
 import 'User/history.dart';
 import 'User/profile.dart';
+import 'package:image_ai/controllers/billing_controller.dart';
 
 final bottomView = [
   History(),
@@ -39,6 +40,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String? style;
     final styles = ['modern', 'minimalist', 'luxury', 'industrial', 'scandinavian'];
 
+    Future<ImageSource?> _chooseSource() async {
+      return showModalBottomSheet<ImageSource>(
+        context: context,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        builder: (ctx) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('choose_image_source'.tr, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: Text('camera'.tr),
+                  onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: Text('gallery'.tr),
+                  onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -46,7 +77,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (ctx) {
         return StatefulBuilder(builder: (ctx, setModalState) {
           Future<void> pickImage() async {
-            final x = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 90);
+            final source = await _chooseSource();
+            if (source == null) return;
+            final x = await ImagePicker().pickImage(source: source, imageQuality: 90);
             if (x != null) {
               setModalState(() => pickedFile = File(x.path));
             }
@@ -59,7 +92,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (!mounted) return;
               Navigator.of(ctx).pop();
               setState(() => _bottomNavIndex = 0);
-              Get.snackbar('Success', 'Room redesign requested', snackPosition: SnackPosition.BOTTOM);
+              Get.snackbar('success'.tr, 'redesign_requested'.tr, snackPosition: SnackPosition.BOTTOM);
+              // Simulate interstitial placement (real ad to be wired with easy_admob_ads_flutter)
+              final billing = Get.find<BillingController>();
+              if (!billing.isPro.value) {
+                // Placeholder: you will see a brief overlay instead of real ad
+                await Get.dialog(
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                      child: const Text('Interstitial Ad Placeholder'),
+                    ),
+                  ),
+                  barrierDismissible: true,
+                );
+              }
             } catch (e) {
               Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
             }
@@ -162,6 +210,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final auth = Get.find<AuthController>();
     final iconList = ["assets/svg/home.svg", "assets/svg/user.svg"];
+    final billing = Get.find<BillingController>();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -239,16 +288,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onTap: (index) => setState(() => _bottomNavIndex = index),
         //other params
       ),
-      body: Obx(() {
+      body: Column(
+        children: [
+          Expanded(child: Obx(() {
         final user = auth.user.value;
         if (user == null) {
           return const Center(child: Text('Welcome!'));
         }
         final fn = user.firstName ?? '';
-        return SingleChildScrollView(
-          child: bottomView[_bottomNavIndex],
-        );
-      }),
+        return SingleChildScrollView(child: bottomView[_bottomNavIndex]);
+      })),
+          Obx(() => billing.isPro.value
+              ? const SizedBox.shrink()
+              : Container(
+                  height: 56,
+                  width: double.infinity,
+                  color: Colors.black12,
+                  alignment: Alignment.center,
+                  child: const Text('Banner Ad Placeholder'),
+                )),
+        ],
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:image_ai/data/auth_repository.dart';
 import 'package:image_ai/data/token_storage.dart';
 import 'package:image_ai/models/user_model.dart';
 import 'package:image_ai/routes/screen_name.dart';
+import 'package:image_ai/controllers/billing_controller.dart';
 
 class AuthController extends GetxController {
   final RxBool isLoggedIn = false.obs;
@@ -83,6 +84,10 @@ class AuthController extends GetxController {
         user.value = UserModel.fromMap(savedUser);
       }
       isLoggedIn.value = true;
+      // Trigger server subscription sync after auth hydration
+      try {
+        await Get.find<BillingController>().syncFromServer();
+      } catch (_) {}
     }
     if (!_hydration.isCompleted) _hydration.complete();
   }
