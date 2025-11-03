@@ -12,8 +12,14 @@ class Env {
   static const String admobBannerIdIos = 'ca-app-pub-3940256099942544/2934735716'; // TEST
   static const String admobInterstitialIdIos = 'ca-app-pub-3940256099942544/4411468910'; // TEST
   static const String admobRewardedIdIos = 'ca-app-pub-3940256099942544/1712485313'; // TEST
+  
+  // App identifiers for managing subscriptions (replace with real IDs)
+  static const String androidPackageName = 'com.room.redesign';
+  static const String iosBundleId = 'com.room.redesign';
 
   // Subscription product identifiers (must match Play/App Store)
   static const String productYearly = 'pro_yearly_36';
   static const String productWeekly = 'pro_weekly_8';
+  static const String productTrialWeekly = 'pro_weekly_trial_3d';
+
 }

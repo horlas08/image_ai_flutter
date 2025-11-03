@@ -31,4 +31,18 @@ class AIRepository {
     final res = await api.dio.post('/api/redesign-room/', data: form);
     return (res.data as Map).cast<String, dynamic>();
   }
+
+  Future<Map<String, dynamic>> redesignRoomGuest({
+    required File originalImage,
+    required String styleChoice,
+  }) async {
+    final form = FormData();
+    form.fields.add(MapEntry('style_choice', styleChoice));
+    form.files.add(MapEntry(
+      'original_image',
+      await MultipartFile.fromFile(originalImage.path, filename: originalImage.uri.pathSegments.last),
+    ));
+    final res = await api.dio.post('/api/guest/generate/', data: form);
+    return (res.data as Map).cast<String, dynamic>();
+  }
 }

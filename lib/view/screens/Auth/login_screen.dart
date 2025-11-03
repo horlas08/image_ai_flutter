@@ -105,6 +105,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Text('no_account_sign_up'.tr, style: AppText.medium12.copyWith(color: Colors.deepPurple)),
                 ),
               ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => Get.offAllNamed(RoutesName.dashboard),
+                child: Text('skip_for_now'.tr),
+              ),
             ],
           )),
         ),

@@ -211,9 +211,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final auth = Get.find<AuthController>();
     final iconList = ["assets/svg/home.svg", "assets/svg/user.svg"];
     final billing = Get.find<BillingController>();
+    final showChrome = auth.isLoggedIn.value; // hide appbar & bottom nav for guests
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: showChrome ? AppBar(
         title: Obx(() {
           final user = auth.user.value;
           final name = user?.firstName ?? '';
@@ -237,10 +238,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ],
-      ),
+      ) : null,
       floatingActionButton: _bottomNavIndex != 3
           ? FloatingActionButton(
-              onPressed: _openRedesignSheet,
+              onPressed: () async {
+                if (!billing.isPro.value) {
+                  await billing.showPaywall();
+                  return;
+                }
+                await _openRedesignSheet();
+              },
               backgroundColor: AppColor.bottomBgColor,
               child: Icon(Icons.add, color: Colors.white, size: 25),
               shape: OutlineInputBorder(
@@ -251,7 +258,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+      bottomNavigationBar: showChrome ? AnimatedBottomNavigationBar.builder(
         itemCount: iconList.length,
         height: 72,
 
@@ -287,18 +294,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         hideAnimationCurve: ElasticInOutCurve(),
         onTap: (index) => setState(() => _bottomNavIndex = index),
         //other params
-      ),
+      ) : null,
       body: Column(
         children: [
           Expanded(child: Obx(() {
         final user = auth.user.value;
-        if (user == null) {
-          return const Center(child: Text('Welcome!'));
+        if (user == null && !showChrome) {
+          // Guest landing - no app bar/bottom nav, just instructions
+          return const SizedBox.shrink();
         }
-        final fn = user.firstName ?? '';
+        final fn = user?.firstName ?? '';
         return SingleChildScrollView(child: bottomView[_bottomNavIndex]);
       })),
-          Obx(() => billing.isPro.value
+          Obx(() => (billing.isPro.value || !showChrome)
               ? const SizedBox.shrink()
               : Container(
                   height: 56,

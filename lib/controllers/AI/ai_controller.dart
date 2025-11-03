@@ -2,11 +2,13 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_ai/controllers/Auth/auth_controller.dart';
 import 'package:image_ai/data/ai_repository.dart';
+import 'package:image_ai/data/token_storage.dart';
 
 class AIController extends GetxController {
   late final AIRepository repo;
   final history = <Map<String, dynamic>>[].obs;
   final loading = false.obs;
+  final _storage = TokenStorage();
 
   @override
   void onInit() {
@@ -19,8 +21,14 @@ class AIController extends GetxController {
   Future<void> fetchHistory() async {
     try {
       loading.value = true;
-      final items = await repo.fetchHistory();
-      history.assignAll(items);
+      final auth = Get.find<AuthController>();
+      if (auth.isLoggedIn.value) {
+        final items = await repo.fetchHistory();
+        history.assignAll(items);
+      } else {
+        final local = await _storage.getGuestHistory();
+        history.assignAll(local);
+      }
       // if (history.isEmpty) {
       //   _injectDummyHistory();
       // }
@@ -35,9 +43,25 @@ class AIController extends GetxController {
     required File originalImage,
     required String styleChoice,
   }) async {
-    final res = await repo.redesignRoom(originalImage: originalImage, styleChoice: styleChoice);
-    await fetchHistory();
-    return res;
+    final auth = Get.find<AuthController>();
+    if (auth.isLoggedIn.value) {
+      final res = await repo.redesignRoom(originalImage: originalImage, styleChoice: styleChoice);
+      await fetchHistory();
+      return res;
+    } else {
+      // Guest generation (server optional). If server not available, you can mock/store locally.
+      try {
+        final res = await repo.redesignRoomGuest(originalImage: originalImage, styleChoice: styleChoice);
+        // Append to local history and persist
+        final local = await _storage.getGuestHistory();
+        local.insert(0, res);
+        await _storage.saveGuestHistory(local);
+        await fetchHistory();
+        return res;
+      } catch (e) {
+        rethrow;
+      }
+    }
   }
 
   // void _injectDummyHistory() {

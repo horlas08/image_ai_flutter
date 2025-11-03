@@ -6,6 +6,7 @@ class TokenStorage {
   static const _keyRefresh = 'refresh_token';
   static const _keyUser = 'user_json';
   static const _keyIsPro = 'is_pro';
+  static const _keyGuestHistory = 'guest_history_json';
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<void> saveTokens(String access, String refresh) async {
@@ -36,6 +37,7 @@ class TokenStorage {
     await _storage.delete(key: _keyRefresh);
     await _storage.delete(key: _keyUser);
     await _storage.delete(key: _keyIsPro);
+    await _storage.delete(key: _keyGuestHistory);
   }
 
   Future<void> saveIsPro(bool value) async {
@@ -45,5 +47,24 @@ class TokenStorage {
   Future<bool> getIsPro() async {
     final v = await _storage.read(key: _keyIsPro);
     return v == '1';
+  }
+
+  Future<void> saveGuestHistory(List<Map<String, dynamic>> items) async {
+    await _storage.write(key: _keyGuestHistory, value: jsonEncode(items));
+  }
+
+  Future<List<Map<String, dynamic>>> getGuestHistory() async {
+    final raw = await _storage.read(key: _keyGuestHistory);
+    if (raw == null) return [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map>()
+            .map<Map<String, dynamic>>((e) => e.cast<String, dynamic>())
+            .toList();
+      }
+    } catch (_) {}
+    return [];
   }
 }
